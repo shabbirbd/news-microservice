@@ -24,6 +24,7 @@ const path_1 = __importDefault(require("path"));
 const os_1 = __importDefault(require("os"));
 const fs_1 = __importDefault(require("fs"));
 fluent_ffmpeg_1.default.setFfmpegPath("/usr/local/bin/ffmpeg");
+fluent_ffmpeg_1.default.setFfprobePath("/usr/local/bin/ffprobe");
 dotenv_1.default.config();
 const TAVUS_API_KEY = process.env.TAVUS_API_KEY || "";
 const AWS_REGION = "us-east-1";

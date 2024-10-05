@@ -10,6 +10,7 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 ffmpeg.setFfmpegPath("/usr/local/bin/ffmpeg");
+ffmpeg.setFfprobePath("/usr/local/bin/ffprobe");
 
 
 dotenv.config();
