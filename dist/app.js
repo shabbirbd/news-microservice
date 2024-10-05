@@ -127,13 +127,15 @@ const updateCreditBalance = (downloadUrl, userId) => __awaiter(void 0, void 0, v
         });
     });
     const mainCost = duration * 0.0208;
-    const response = yield fetch(`https://vendor.com/api/users/creditBalance`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ userId: userId, newCredit: mainCost })
-    });
+    console.log(duration, "duration......");
+    return duration;
+    // const response = await fetch(`https://vendor.com/api/users/creditBalance`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json"
+    //   },
+    //   body: JSON.stringify({ userId: userId, newCredit: mainCost })
+    // })
 });
 const transcodeVideo = (url_1, ...args_1) => __awaiter(void 0, [url_1, ...args_1], void 0, function* (url, targetResolution = '1920x1080') {
     const outputFilePath = path_1.default.join(os_1.default.tmpdir(), `${(0, uuid_1.v4)()}.mp4`);
@@ -249,9 +251,10 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         //   console.log(`Done...`)
         //   results = [...results, videoUrl]
         // };
-        const filePath = yield mergeVideos(results);
-        const s3Url = yield uploadToS3(filePath);
-        console.log('margedUrl.....', s3Url);
+        const newResult = yield updateCreditBalance(results[1], "123");
+        // const filePath = await mergeVideos(results);
+        // const s3Url = await uploadToS3(filePath)
+        // console.log('margedUrl.....', s3Url)
         // const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
         // Step 7: update course with result url....
         // const newNews = {
@@ -262,7 +265,7 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         // };
         // const updatedCourse = await updateCourse(currentNews._id, newNews)
         // console.log("news updatesd...Exiting process.................................")
-        res.status(200).json({ s3Url });
+        res.status(200).json({ newResult });
     }
     catch (error) {
         console.error('Error processing request:', error);

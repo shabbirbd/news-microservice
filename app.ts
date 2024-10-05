@@ -130,13 +130,15 @@ const updateCreditBalance = async (downloadUrl: string, userId: string) => {
     });
   });
   const mainCost = duration * 0.0208
-  const response = await fetch(`https://vendor.com/api/users/creditBalance`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ userId: userId, newCredit: mainCost })
-  })
+  console.log(duration, "duration......")
+  return duration
+  // const response = await fetch(`https://vendor.com/api/users/creditBalance`, {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json"
+  //   },
+  //   body: JSON.stringify({ userId: userId, newCredit: mainCost })
+  // })
 
 };
 
@@ -276,12 +278,14 @@ app.post('/generateVideo', async (req, res) => {
     //   results = [...results, videoUrl]
     // };
 
+    const newResult = await updateCreditBalance(results[1], "123")
 
-    const filePath = await mergeVideos(results);
 
-    const s3Url = await uploadToS3(filePath)
+    // const filePath = await mergeVideos(results);
 
-    console.log('margedUrl.....', s3Url)
+    // const s3Url = await uploadToS3(filePath)
+
+    // console.log('margedUrl.....', s3Url)
 
 
     // const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
@@ -297,7 +301,7 @@ app.post('/generateVideo', async (req, res) => {
 
     // const updatedCourse = await updateCourse(currentNews._id, newNews)
     // console.log("news updatesd...Exiting process.................................")
-    res.status(200).json({ s3Url });
+    res.status(200).json({ newResult });
 
   } catch (error: any) {
     console.error('Error processing request:', error);
