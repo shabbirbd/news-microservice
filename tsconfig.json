@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "target": "es6",
+      "module": "commonjs",
+      "outDir": "./dist",
+      "baseUrl": "./",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "types": ["express", "node"],
+      "typeRoots": ["./node_modules/@types"],
+      "forceConsistentCasingInFileNames": true
+    },
+    "include": ["*"],
+    "exclude": ["node_modules"]
+}
