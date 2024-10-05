@@ -253,10 +253,10 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         //   console.log(`Done...`)
         //   results = [...results, videoUrl]
         // };
-        const newResult = yield updateCreditBalance(results[1], "123");
-        // const filePath = await mergeVideos(results);
-        // const s3Url = await uploadToS3(filePath)
-        // console.log('margedUrl.....', s3Url)
+        // const newResult = await updateCreditBalance(results[1], "123")
+        const filePath = yield mergeVideos(results);
+        const s3Url = yield uploadToS3(filePath);
+        console.log('margedUrl.....', s3Url);
         // const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
         // Step 7: update course with result url....
         // const newNews = {
@@ -267,7 +267,7 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         // };
         // const updatedCourse = await updateCourse(currentNews._id, newNews)
         // console.log("news updatesd...Exiting process.................................")
-        res.status(200).json({ newResult });
+        res.status(200).json({ s3Url });
     }
     catch (error) {
         console.error('Error processing request:', error);
