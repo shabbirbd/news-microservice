@@ -12,8 +12,11 @@ import fs from 'fs';
 import { execSync } from 'child_process';
 
 
-ffmpeg.setFfmpegPath("/usr/local/bin/ffmpeg");
-ffmpeg.setFfprobePath("/usr/local/bin/ffprobe");
+const ffmpegPath = '/usr/local/bin/ffmpeg';
+const ffprobePath = '/usr/local/bin/ffprobe'
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
 
 dotenv.config();
