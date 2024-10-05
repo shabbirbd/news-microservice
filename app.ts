@@ -257,6 +257,7 @@ const updateCourse = async (courseId: string, newNews: any) => {
 
 app.post('/generateVideo', async (req, res) => {
   try {
+    console.log('Current PATH:', process.env.PATH);
     // const currentNews = await req.body;
     const results = await req.body;
     // console.log(currentNews, "Starting the process....")

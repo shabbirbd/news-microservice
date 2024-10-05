@@ -233,6 +233,7 @@ const updateCourse = (courseId, newNews) => __awaiter(void 0, void 0, void 0, fu
 });
 app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('Current PATH:', process.env.PATH);
         // const currentNews = await req.body;
         const results = yield req.body;
         // console.log(currentNews, "Starting the process....")
