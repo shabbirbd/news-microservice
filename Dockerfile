@@ -28,7 +28,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY package*.json ./
 
-# Set the PATH to include /usr/bin where FFmpeg is typically installed
+# Ensure FFmpeg is in the PATH
 ENV PATH="/usr/bin:${PATH}"
 
 # Verify FFmpeg installation

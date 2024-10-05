@@ -12,11 +12,8 @@ import fs from 'fs';
 import { execSync } from 'child_process';
 
 
-const ffmpegPath = '/usr/local/bin/ffmpeg';
-const ffprobePath = '/usr/local/bin/ffprobe'
-
-ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath);
+ffmpeg.setFfmpegPath('ffmpeg');
+ffmpeg.setFfprobePath('ffprobe');
 
 
 dotenv.config();
@@ -290,12 +287,11 @@ app.post('/generateVideo', async (req, res) => {
 
  
     try {
-      console.log('FFmpeg version:', execSync('/usr/local/bin/ffmpeg -version').toString());
-      console.log('FFprobe version:', execSync('/usr/local/bin/ffprobe -version').toString());
+      console.log('FFmpeg version:', execSync('ffmpeg -version').toString());
+      console.log('FFprobe version:', execSync('ffprobe -version').toString());
     } catch (error) {
       console.error('Error executing FFmpeg/FFprobe:', error);
     }
-
 
     const filePath = await mergeVideos(results);
 

@@ -24,10 +24,8 @@ const path_1 = __importDefault(require("path"));
 const os_1 = __importDefault(require("os"));
 const fs_1 = __importDefault(require("fs"));
 const child_process_1 = require("child_process");
-const ffmpegPath = '/usr/local/bin/ffmpeg';
-const ffprobePath = '/usr/local/bin/ffprobe';
-fluent_ffmpeg_1.default.setFfmpegPath(ffmpegPath);
-fluent_ffmpeg_1.default.setFfprobePath(ffprobePath);
+fluent_ffmpeg_1.default.setFfmpegPath('ffmpeg');
+fluent_ffmpeg_1.default.setFfprobePath('ffprobe');
 dotenv_1.default.config();
 const TAVUS_API_KEY = process.env.TAVUS_API_KEY || "";
 const AWS_REGION = "us-east-1";
@@ -258,8 +256,8 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         // };
         // const newResult = await updateCreditBalance(results[1], "123")
         try {
-            console.log('FFmpeg version:', (0, child_process_1.execSync)('/usr/local/bin/ffmpeg -version').toString());
-            console.log('FFprobe version:', (0, child_process_1.execSync)('/usr/local/bin/ffprobe -version').toString());
+            console.log('FFmpeg version:', (0, child_process_1.execSync)('ffmpeg -version').toString());
+            console.log('FFprobe version:', (0, child_process_1.execSync)('ffprobe -version').toString());
         }
         catch (error) {
             console.error('Error executing FFmpeg/FFprobe:', error);
