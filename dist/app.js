@@ -253,9 +253,8 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         const filePath = yield mergeVideos(results);
         const s3Url = yield uploadToS3(filePath);
         console.log('margedUrl.....', s3Url);
-        const fullScript = currentNews.videos.map((item) => item.script).join(". ");
         // Step 7: update course with result url....
-        const newNews = Object.assign(Object.assign({}, currentNews), { newsUrl: s3Url, script: fullScript, status: 'active' });
+        const newNews = Object.assign(Object.assign({}, currentNews), { newsUrl: s3Url, status: 'active' });
         const updatedCourse = yield updateCourse(currentNews._id, newNews);
         console.log("news updatesd...Exiting process.................................");
         res.status(200).json({ updatedCourse });

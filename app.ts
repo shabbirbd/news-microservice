@@ -286,14 +286,11 @@ app.post('/generateVideo', async (req, res) => {
     console.log('margedUrl.....', s3Url)
 
 
-    const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
-
 
     // Step 7: update course with result url....
     const newNews = {
       ...currentNews,
       newsUrl: s3Url,
-      script: fullScript,
       status: 'active'
     };
 
