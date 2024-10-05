@@ -258,11 +258,11 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         // };
         // const newResult = await updateCreditBalance(results[1], "123")
         try {
-            const ffmpegVersion = (0, child_process_1.execSync)('ffmpeg -version').toString();
-            console.log('FFmpeg version:', ffmpegVersion);
+            console.log('FFmpeg version:', (0, child_process_1.execSync)('/usr/local/bin/ffmpeg -version').toString());
+            console.log('FFprobe version:', (0, child_process_1.execSync)('/usr/local/bin/ffprobe -version').toString());
         }
         catch (error) {
-            console.error('Error executing FFmpeg:', error);
+            console.error('Error executing FFmpeg/FFprobe:', error);
         }
         const filePath = yield mergeVideos(results);
         const s3Url = yield uploadToS3(filePath);

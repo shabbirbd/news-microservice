@@ -288,11 +288,12 @@ app.post('/generateVideo', async (req, res) => {
 
     // const newResult = await updateCreditBalance(results[1], "123")
 
+ 
     try {
-      const ffmpegVersion = execSync('ffmpeg -version').toString();
-      console.log('FFmpeg version:', ffmpegVersion);
+      console.log('FFmpeg version:', execSync('/usr/local/bin/ffmpeg -version').toString());
+      console.log('FFprobe version:', execSync('/usr/local/bin/ffprobe -version').toString());
     } catch (error) {
-      console.error('Error executing FFmpeg:', error);
+      console.error('Error executing FFmpeg/FFprobe:', error);
     }
 
 
