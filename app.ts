@@ -283,21 +283,14 @@ app.post('/generateVideo', async (req, res) => {
     //   results = [...results, videoUrl]
     // };
 
-    // const newResult = await updateCreditBalance(results[1], "123")
+    const newResult = await updateCreditBalance(results[1], "123")
 
  
-    try {
-      console.log('FFmpeg version:', execSync('ffmpeg -version').toString());
-      console.log('FFprobe version:', execSync('ffprobe -version').toString());
-    } catch (error) {
-      console.error('Error executing FFmpeg/FFprobe:', error);
-    }
+    // const filePath = await mergeVideos(results);
 
-    const filePath = await mergeVideos(results);
+    // const s3Url = await uploadToS3(filePath)
 
-    const s3Url = await uploadToS3(filePath)
-
-    console.log('margedUrl.....', s3Url)
+    // console.log('margedUrl.....', s3Url)
 
 
     // const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
@@ -313,7 +306,7 @@ app.post('/generateVideo', async (req, res) => {
 
     // const updatedCourse = await updateCourse(currentNews._id, newNews)
     // console.log("news updatesd...Exiting process.................................")
-    res.status(200).json({ s3Url });
+    res.status(200).json({ newResult });
 
   } catch (error: any) {
     console.error('Error processing request:', error);
