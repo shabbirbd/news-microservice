@@ -102,10 +102,12 @@ const getDetailedInfo = async (videoId: string, userId: string) => {
         console.log("Video ready...Getting video url...")
         const resultUrl = jobDetails.download_url;
         console.log('got the result updating user credit balance....')
-        await updateCreditBalance(resultUrl, userId)
-        console.log('Video URl...:', resultUrl);
+        await updateCreditBalance(resultUrl, userId);
+        const uploadedUrl = await uploadAndSave(resultUrl);
 
-        return resultUrl;
+        console.log('Video URl...:', uploadedUrl);
+
+        return uploadedUrl;
       } else if (jobStatus === 'error' || jobStatus === 'deleted') {
         console.log(`Job status is: ${jobStatus}, unable to create video...`);
         return "";
@@ -117,6 +119,32 @@ const getDetailedInfo = async (videoId: string, userId: string) => {
       console.error('Error retrieving job details:', error.message);
       throw error;
     }
+  }
+};
+
+
+const uploadAndSave = async (downloadUrl: string) => {
+  try {
+      const response = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
+
+      const fileContent = Buffer.from(response.data, 'binary');
+
+      console.log('Preparing S3 upload params');
+      const params = {
+          Bucket: S3_BUCKET_NAME as string,
+          Key: `videos/${uuidv4()}.mp4`,
+          Body: fileContent,
+          ContentType: 'video/mp4',
+          ACL: 'public-read'
+      };
+
+      console.log('Starting S3 upload');
+      const result = await s3.upload(params).promise();
+
+      return result.Location;
+  } catch (error) {
+      console.error('Detailed error in uploadToS3:', error);
+      throw error;
   }
 };
 
@@ -273,24 +301,25 @@ app.post('/generateVideo', async (req, res) => {
       } else {
         console.log(`Success, VideoUrl: ${videoUrl}`);
       }
+      const constructedVideo = {...video, newsUrl: videoUrl};
       console.log(`Done...`)
-      results = [...results, videoUrl]
+      results = [...results, constructedVideo]
     };
 
 
  
-    const filePath = await mergeVideos(results);
+    // const filePath = await mergeVideos(results);
 
-    const s3Url = await uploadToS3(filePath)
+    // const s3Url = await uploadToS3(filePath)
 
-    console.log('margedUrl.....', s3Url)
+    // console.log('margedUrl.....', s3Url)
 
 
 
     // Step 7: update course with result url....
     const newNews = {
       ...currentNews,
-      newsUrl: s3Url,
+      videos: [...results],
       status: 'active'
     };
 
