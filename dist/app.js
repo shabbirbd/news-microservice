@@ -23,6 +23,7 @@ const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
 const path_1 = __importDefault(require("path"));
 const os_1 = __importDefault(require("os"));
 const fs_1 = __importDefault(require("fs"));
+const child_process_1 = require("child_process");
 fluent_ffmpeg_1.default.setFfmpegPath("/usr/local/bin/ffmpeg");
 fluent_ffmpeg_1.default.setFfprobePath("/usr/local/bin/ffprobe");
 dotenv_1.default.config();
@@ -254,6 +255,13 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         //   results = [...results, videoUrl]
         // };
         // const newResult = await updateCreditBalance(results[1], "123")
+        try {
+            const ffmpegVersion = (0, child_process_1.execSync)('ffmpeg -version').toString();
+            console.log('FFmpeg version:', ffmpegVersion);
+        }
+        catch (error) {
+            console.error('Error executing FFmpeg:', error);
+        }
         const filePath = yield mergeVideos(results);
         const s3Url = yield uploadToS3(filePath);
         console.log('margedUrl.....', s3Url);

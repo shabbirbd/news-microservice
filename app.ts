@@ -9,6 +9,9 @@ import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+import { execSync } from 'child_process';
+
+
 ffmpeg.setFfmpegPath("/usr/local/bin/ffmpeg");
 ffmpeg.setFfprobePath("/usr/local/bin/ffprobe");
 
@@ -281,6 +284,13 @@ app.post('/generateVideo', async (req, res) => {
     // };
 
     // const newResult = await updateCreditBalance(results[1], "123")
+
+    try {
+      const ffmpegVersion = execSync('ffmpeg -version').toString();
+      console.log('FFmpeg version:', ffmpegVersion);
+    } catch (error) {
+      console.error('Error executing FFmpeg:', error);
+    }
 
 
     const filePath = await mergeVideos(results);
