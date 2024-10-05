@@ -98,8 +98,9 @@ const getDetailedInfo = (videoId, userId) => __awaiter(void 0, void 0, void 0, f
                 const resultUrl = jobDetails.download_url;
                 console.log('got the result updating user credit balance....');
                 yield updateCreditBalance(resultUrl, userId);
-                console.log('Video URl...:', resultUrl);
-                return resultUrl;
+                const uploadedUrl = yield uploadAndSave(resultUrl);
+                console.log('Video URl...:', uploadedUrl);
+                return uploadedUrl;
             }
             else if (jobStatus === 'error' || jobStatus === 'deleted') {
                 console.log(`Job status is: ${jobStatus}, unable to create video...`);
@@ -114,6 +115,27 @@ const getDetailedInfo = (videoId, userId) => __awaiter(void 0, void 0, void 0, f
             console.error('Error retrieving job details:', error.message);
             throw error;
         }
+    }
+});
+const uploadAndSave = (downloadUrl) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield axios_1.default.get(downloadUrl, { responseType: 'arraybuffer' });
+        const fileContent = Buffer.from(response.data, 'binary');
+        console.log('Preparing S3 upload params');
+        const params = {
+            Bucket: S3_BUCKET_NAME,
+            Key: `videos/${(0, uuid_1.v4)()}.mp4`,
+            Body: fileContent,
+            ContentType: 'video/mp4',
+            ACL: 'public-read'
+        };
+        console.log('Starting S3 upload');
+        const result = yield s3.upload(params).promise();
+        return result.Location;
+    }
+    catch (error) {
+        console.error('Detailed error in uploadToS3:', error);
+        throw error;
     }
 });
 const updateCreditBalance = (downloadUrl, userId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -246,15 +268,16 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
             else {
                 console.log(`Success, VideoUrl: ${videoUrl}`);
             }
+            const constructedVideo = Object.assign(Object.assign({}, video), { newsUrl: videoUrl });
             console.log(`Done...`);
-            results = [...results, videoUrl];
+            results = [...results, constructedVideo];
         }
         ;
-        const filePath = yield mergeVideos(results);
-        const s3Url = yield uploadToS3(filePath);
-        console.log('margedUrl.....', s3Url);
+        // const filePath = await mergeVideos(results);
+        // const s3Url = await uploadToS3(filePath)
+        // console.log('margedUrl.....', s3Url)
         // Step 7: update course with result url....
-        const newNews = Object.assign(Object.assign({}, currentNews), { newsUrl: s3Url, status: 'active' });
+        const newNews = Object.assign(Object.assign({}, currentNews), { videos: [...results], status: 'active' });
         const updatedCourse = yield updateCourse(currentNews._id, newNews);
         console.log("news updatesd...Exiting process.................................");
         res.status(200).json({ updatedCourse });
