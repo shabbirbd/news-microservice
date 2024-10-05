@@ -5,11 +5,11 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import AWS from 'aws-sdk';
 import ffmpeg from 'fluent-ffmpeg';
-import ffmpegPath from 'ffmpeg-static';
+// import ffmpegPath from 'ffmpeg-static';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-ffmpeg.setFfmpegPath(ffmpegPath || '');
+ffmpeg.setFfmpegPath("/usr/local/bin/ffmpeg");
 
 
 dotenv.config();
