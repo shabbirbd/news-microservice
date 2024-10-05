@@ -5,11 +5,9 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import AWS from 'aws-sdk';
 import ffmpeg from 'fluent-ffmpeg';
-// import ffmpegPath from 'ffmpeg-static';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import { execSync } from 'child_process';
 
 
 ffmpeg.setFfmpegPath('ffmpeg');
@@ -135,14 +133,13 @@ const updateCreditBalance = async (downloadUrl: string, userId: string) => {
   });
   const mainCost = duration * 0.0208
   console.log(duration, "duration......")
-  return duration
-  // const response = await fetch(`https://vendor.com/api/users/creditBalance`, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json"
-  //   },
-  //   body: JSON.stringify({ userId: userId, newCredit: mainCost })
-  // })
+  const response = await fetch(`https://vendor.com/api/users/creditBalance`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ userId: userId, newCredit: mainCost })
+  })
 
 };
 
@@ -261,52 +258,48 @@ const updateCourse = async (courseId: string, newNews: any) => {
 app.post('/generateVideo', async (req, res) => {
   try {
     console.log('Current PATH:', process.env.PATH);
-    // const currentNews = await req.body;
-    const results = await req.body;
-    // console.log(currentNews, "Starting the process....")
-    // console.log(currentNews.videos, "videos...")
+    const currentNews = await req.body;
+    console.log(currentNews, "Starting the process....")
 
     // Step 1: Generate Video
-    // const videos = [...currentNews.videos];
-    // let results: any[] = [];
+    const videos = [...currentNews.videos];
+    let results: any[] = [];
 
-    // console.log(videos, "videos......")
-    // for (const video of videos) {
-    //   console.log(`Making video for: ${JSON.stringify(video)}`);
-    //   const videoUrl: any = await generateVideo(video, currentNews, video.script);
-    //   if (videoUrl.length < 1) {
-    //     console.log('failed to create video for this step....')
-    //   } else {
-    //     console.log(`Success, VideoUrl: ${videoUrl}`);
-    //   }
-    //   console.log(`Done...`)
-    //   results = [...results, videoUrl]
-    // };
+    for (const video of videos) {
+      console.log(`Making video for: ${JSON.stringify(video)}`);
+      const videoUrl: any = await generateVideo(video, currentNews, video.script);
+      if (videoUrl.length < 1) {
+        console.log('failed to create video for this step....')
+      } else {
+        console.log(`Success, VideoUrl: ${videoUrl}`);
+      }
+      console.log(`Done...`)
+      results = [...results, videoUrl]
+    };
 
-    const newResult = await updateCreditBalance(results[1], "123")
 
  
-    // const filePath = await mergeVideos(results);
+    const filePath = await mergeVideos(results);
 
-    // const s3Url = await uploadToS3(filePath)
+    const s3Url = await uploadToS3(filePath)
 
-    // console.log('margedUrl.....', s3Url)
+    console.log('margedUrl.....', s3Url)
 
 
-    // const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
+    const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
 
 
     // Step 7: update course with result url....
-    // const newNews = {
-    //   ...currentNews,
-    //   newsUrl: margedUrl,
-    //   script: fullScript,
-    //   status: 'active'
-    // };
+    const newNews = {
+      ...currentNews,
+      newsUrl: s3Url,
+      script: fullScript,
+      status: 'active'
+    };
 
-    // const updatedCourse = await updateCourse(currentNews._id, newNews)
-    // console.log("news updatesd...Exiting process.................................")
-    res.status(200).json({ newResult });
+    const updatedCourse = await updateCourse(currentNews._id, newNews)
+    console.log("news updatesd...Exiting process.................................")
+    res.status(200).json({ updatedCourse });
 
   } catch (error: any) {
     console.error('Error processing request:', error);

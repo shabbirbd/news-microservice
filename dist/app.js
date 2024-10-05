@@ -19,7 +19,6 @@ const axios_1 = __importDefault(require("axios"));
 const uuid_1 = require("uuid");
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
-// import ffmpegPath from 'ffmpeg-static';
 const path_1 = __importDefault(require("path"));
 const os_1 = __importDefault(require("os"));
 const fs_1 = __importDefault(require("fs"));
@@ -129,14 +128,13 @@ const updateCreditBalance = (downloadUrl, userId) => __awaiter(void 0, void 0, v
     });
     const mainCost = duration * 0.0208;
     console.log(duration, "duration......");
-    return duration;
-    // const response = await fetch(`https://vendor.com/api/users/creditBalance`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json"
-    //   },
-    //   body: JSON.stringify({ userId: userId, newCredit: mainCost })
-    // })
+    const response = yield fetch(`https://vendor.com/api/users/creditBalance`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ userId: userId, newCredit: mainCost })
+    });
 });
 const transcodeVideo = (url_1, ...args_1) => __awaiter(void 0, [url_1, ...args_1], void 0, function* (url, targetResolution = '1920x1080') {
     const outputFilePath = path_1.default.join(os_1.default.tmpdir(), `${(0, uuid_1.v4)()}.mp4`);
@@ -234,40 +232,33 @@ const updateCourse = (courseId, newNews) => __awaiter(void 0, void 0, void 0, fu
 app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('Current PATH:', process.env.PATH);
-        // const currentNews = await req.body;
-        const results = yield req.body;
-        // console.log(currentNews, "Starting the process....")
-        // console.log(currentNews.videos, "videos...")
+        const currentNews = yield req.body;
+        console.log(currentNews, "Starting the process....");
         // Step 1: Generate Video
-        // const videos = [...currentNews.videos];
-        // let results: any[] = [];
-        // console.log(videos, "videos......")
-        // for (const video of videos) {
-        //   console.log(`Making video for: ${JSON.stringify(video)}`);
-        //   const videoUrl: any = await generateVideo(video, currentNews, video.script);
-        //   if (videoUrl.length < 1) {
-        //     console.log('failed to create video for this step....')
-        //   } else {
-        //     console.log(`Success, VideoUrl: ${videoUrl}`);
-        //   }
-        //   console.log(`Done...`)
-        //   results = [...results, videoUrl]
-        // };
-        const newResult = yield updateCreditBalance(results[1], "123");
-        // const filePath = await mergeVideos(results);
-        // const s3Url = await uploadToS3(filePath)
-        // console.log('margedUrl.....', s3Url)
-        // const fullScript = currentNews.videos.map((item: any)=> item.script).join(". ");
+        const videos = [...currentNews.videos];
+        let results = [];
+        for (const video of videos) {
+            console.log(`Making video for: ${JSON.stringify(video)}`);
+            const videoUrl = yield generateVideo(video, currentNews, video.script);
+            if (videoUrl.length < 1) {
+                console.log('failed to create video for this step....');
+            }
+            else {
+                console.log(`Success, VideoUrl: ${videoUrl}`);
+            }
+            console.log(`Done...`);
+            results = [...results, videoUrl];
+        }
+        ;
+        const filePath = yield mergeVideos(results);
+        const s3Url = yield uploadToS3(filePath);
+        console.log('margedUrl.....', s3Url);
+        const fullScript = currentNews.videos.map((item) => item.script).join(". ");
         // Step 7: update course with result url....
-        // const newNews = {
-        //   ...currentNews,
-        //   newsUrl: margedUrl,
-        //   script: fullScript,
-        //   status: 'active'
-        // };
-        // const updatedCourse = await updateCourse(currentNews._id, newNews)
-        // console.log("news updatesd...Exiting process.................................")
-        res.status(200).json({ newResult });
+        const newNews = Object.assign(Object.assign({}, currentNews), { newsUrl: s3Url, script: fullScript, status: 'active' });
+        const updatedCourse = yield updateCourse(currentNews._id, newNews);
+        console.log("news updatesd...Exiting process.................................");
+        res.status(200).json({ updatedCourse });
     }
     catch (error) {
         console.error('Error processing request:', error);
