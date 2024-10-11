@@ -266,13 +266,13 @@ const uploadToS3 = async (filePath: any): Promise<string> => {
 
 
 
-const updateCourse = async (courseId: string, newNews: any) => {
+const updateCourse = async (newsId: string, newNews: any) => {
   const response = await fetch('https://vendor.com/api/course', {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ courseId: courseId, newNews: newNews })
+    body: JSON.stringify({ newsId: newsId, newNews: newNews })
   });
   if (response.ok) {
     console.log("Course updated successfully....")
@@ -294,16 +294,22 @@ app.post('/generateVideo', async (req, res) => {
     let results: any[] = [];
 
     for (const video of videos) {
-      console.log(`Making video for: ${JSON.stringify(video)}`);
-      const videoUrl: any = await generateVideo(video, currentNews, video.script);
-      if (videoUrl.length < 1) {
-        console.log('failed to create video for this step....')
+      if(video.avatar){
+        console.log(`Making video for: ${JSON.stringify(video)}`);
+        const videoUrl: any = await generateVideo(video, currentNews, video.script);
+        if (videoUrl.length < 1) {
+          console.log('failed to create video for this step....')
+        } else {
+          console.log(`Success, VideoUrl: ${videoUrl}`);
+          const constructedVideo = {...video, newsUrl: videoUrl};
+          results = [...results, constructedVideo];
+          console.log(`Done...`)
+          console.log(results, "newResult...")
+        }
       } else {
-        console.log(`Success, VideoUrl: ${videoUrl}`);
+        results = [...results, {...video}]
+        console.log('its a raw video, new result is..', results)
       }
-      const constructedVideo = {...video, newsUrl: videoUrl};
-      console.log(`Done...`)
-      results = [...results, constructedVideo]
     };
 
 
