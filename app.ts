@@ -8,6 +8,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+import FormData from 'form-data';
 
 
 ffmpeg.setFfmpegPath('ffmpeg');
@@ -21,6 +22,7 @@ const AWS_REGION = "us-east-1";
 const S3_BUCKET_NAME = "didvideoupload";
 const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
 const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 
 
@@ -235,6 +237,79 @@ const mergeVideos = async (urls: string[]): Promise<string> => {
 };
 
 
+const extractAudio = async(videoUrl:string) => {
+  return new Promise((resolve, reject) => {
+    const outputFilePath = path.join(os.tmpdir(), `${uuidv4()}.mp3`);
+
+    ffmpeg(videoUrl)
+      .output(outputFilePath)
+      .audioCodec('libmp3lame') // Set audio codec to MP3
+      .noVideo() // Extract audio only
+      .on('end', () => {
+        console.log(`Audio file saved: ${outputFilePath}`);
+        resolve(outputFilePath); // Return the path of the extracted audio file
+      })
+      .on('error', (err) => {
+        console.error('Error during audio extraction:', err);
+        reject(err);
+      })
+      .run();
+  });
+};
+
+
+const  getAudioDuration = async (audioFilePath : string)=> {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(audioFilePath, (err, metadata) => {
+      if (err) {
+        return reject(err);
+      }
+      // Duration is in seconds
+      const duration = metadata.format.duration;
+      resolve(duration);
+    });
+  });
+}
+
+const extractAudioAndGetTranscript = async (url: string, userId: string) =>{
+  const filePath: any = await extractAudio(url);
+  const apiUrl = 'https://api.openai.com/v1/audio/transcriptions';
+  // Prepare form data to send audio file
+  const formData = new FormData();
+  formData.append('file', fs.createReadStream(filePath));
+  formData.append('model', 'whisper-1');
+  formData.append('response_format', 'text');
+  try {
+    const response = await axios.post(apiUrl, formData, {
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        ...formData.getHeaders() // Include the form data headers
+      }
+    });
+
+    const transcript = response.data;
+    const duration: any = await getAudioDuration(filePath);
+    console.log(duration, "duration....")
+    
+    const cost = (parseFloat(duration)/60) * 0.006;
+    const costResponse = await fetch(`https://vendor.com/api/users/creditBalance`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ userId: userId, newCredit: cost })
+    })
+    await fs.unlink(filePath, ()=> {
+      console.log("unlinked audio file...")
+    });
+    return transcript;
+  } catch (err: any) {
+    console.error('Error during transcription:', err);
+    return ""
+  }
+};
+
+
 
 
 const uploadToS3 = async (filePath: any): Promise<string> => {
@@ -306,13 +381,15 @@ app.post('/generateVideo', async (req, res) => {
           const constructedVideo = {...video, newsUrl: videoUrl};
           results = [...results, constructedVideo];
           console.log(`Done...`)
-          console.log(results, "newResult...")
         }
       } else {
-        results = [...results, {...video}]
-        console.log('its a raw video, new result is..', results)
+        const extractedTranscript = await extractAudioAndGetTranscript(video.newsUrl, currentNews.userId);
+        const newVideo = {...video, script: extractedTranscript}
+        results = [...results, {...newVideo}]
+        console.log('its a raw video,..')
       }
     };
+
 
     const urls = results.map((item)=> item.newsUrl);
  
@@ -347,12 +424,3 @@ const PORT = 5007;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`News video creation running on ${PORT}`);
 });
-
-// export default app;
-
-
-
-
-// "@ffmpeg-installer/ffmpeg": "^1.1.0",
-// "fluent-ffmpeg": "^2.1.3",
-// "youtube-dl-exec": "^3.0.7",
