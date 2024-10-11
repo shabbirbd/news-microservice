@@ -314,13 +314,13 @@ app.post('/generateVideo', async (req, res) => {
       }
     };
 
-
+    const urls = results.map((item)=> item.newsUrl);
  
-    // const filePath = await mergeVideos(results);
+    const filePath = await mergeVideos(urls);
 
-    // const s3Url = await uploadToS3(filePath)
+    const s3Url = await uploadToS3(filePath)
 
-    // console.log('margedUrl.....', s3Url)
+    console.log('margedUrl.....', s3Url)
 
 
 
@@ -328,7 +328,8 @@ app.post('/generateVideo', async (req, res) => {
     const newNews = {
       ...currentNews,
       videos: [...results],
-      status: 'active'
+      status: 'active',
+      newsUrl: s3Url
     };
 
     const updatedCourse = await updateNews(currentNews._id, newNews)
