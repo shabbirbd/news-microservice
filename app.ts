@@ -266,8 +266,8 @@ const uploadToS3 = async (filePath: any): Promise<string> => {
 
 
 
-const updateCourse = async (newsId: string, newNews: any) => {
-  const response = await fetch('https://vendor.com/api/course', {
+const updateNews = async (newsId: string, newNews: any) => {
+  const response = await fetch('https://vendor.com/api/news', {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
@@ -275,11 +275,13 @@ const updateCourse = async (newsId: string, newNews: any) => {
     body: JSON.stringify({ newsId: newsId, newNews: newNews })
   });
   if (response.ok) {
-    console.log("Course updated successfully....")
+    console.log("news updated successfully....")
   }
   const data = await response.json();
   return data
 }
+
+
 
 
 
@@ -329,7 +331,7 @@ app.post('/generateVideo', async (req, res) => {
       status: 'active'
     };
 
-    const updatedCourse = await updateCourse(currentNews._id, newNews)
+    const updatedCourse = await updateNews(currentNews._id, newNews)
     console.log("news updatesd...Exiting process.................................")
     res.status(200).json({ updatedCourse });
 

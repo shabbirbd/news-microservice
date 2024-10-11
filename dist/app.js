@@ -237,8 +237,8 @@ const uploadToS3 = (filePath) => __awaiter(void 0, void 0, void 0, function* () 
     });
     return result.Location;
 });
-const updateCourse = (newsId, newNews) => __awaiter(void 0, void 0, void 0, function* () {
-    const response = yield fetch('https://vendor.com/api/course', {
+const updateNews = (newsId, newNews) => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield fetch('https://vendor.com/api/news', {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -246,7 +246,7 @@ const updateCourse = (newsId, newNews) => __awaiter(void 0, void 0, void 0, func
         body: JSON.stringify({ newsId: newsId, newNews: newNews })
     });
     if (response.ok) {
-        console.log("Course updated successfully....");
+        console.log("news updated successfully....");
     }
     const data = yield response.json();
     return data;
@@ -285,7 +285,7 @@ app.post('/generateVideo', (req, res) => __awaiter(void 0, void 0, void 0, funct
         // console.log('margedUrl.....', s3Url)
         // Step 7: update course with result url....
         const newNews = Object.assign(Object.assign({}, currentNews), { videos: [...results], status: 'active' });
-        const updatedCourse = yield updateCourse(currentNews._id, newNews);
+        const updatedCourse = yield updateNews(currentNews._id, newNews);
         console.log("news updatesd...Exiting process.................................");
         res.status(200).json({ updatedCourse });
     }
